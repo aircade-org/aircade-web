@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { Code, Gamepad2, Monitor, Tv } from 'lucide-react';
 
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 
 import { cn } from '@/lib/utils';
@@ -54,6 +55,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 pr-4">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"
