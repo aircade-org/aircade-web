@@ -1,9 +1,11 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import type { Metadata } from 'next';
 
-import { NextFontWithVariable } from 'next/dist/compiled/@next/font';
+import { type NextFontWithVariable } from 'next/dist/compiled/@next/font';
 import { Lato, Spline_Sans_Mono } from 'next/font/google';
+
+import { SiteHeader } from '@/components/site-header';
 
 import '../globals.css';
 import { Providers } from '../providers';
@@ -35,9 +37,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${lato.variable} ${splineSansMono.variable} antialiased`}
+        className={`${lato.variable} ${splineSansMono.variable} h-screen overflow-hidden antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex h-full flex-col">
+            <SiteHeader />
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

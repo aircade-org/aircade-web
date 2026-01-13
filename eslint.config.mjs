@@ -38,8 +38,6 @@ const eslintConfig = defineConfig([
       ],
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
       '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
-      '@typescript-eslint/prefer-optional-chain': 'warn',
 
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',

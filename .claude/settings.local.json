@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(test:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm run type-check:*)",
+      "Bash(pnpm run test:*)",
+      "Bash(pnpm run lint)",
+      "Bash(npx next lint --dir src)",
+      "Bash(npx next lint .)",
+      "Bash(npx next --help:*)",
+      "Bash(npx eslint:*)",
+      "Bash(pnpm run format:check:*)",
+      "Bash(pnpm run format:*)",
+      "Bash(pnpm run check-all:*)",
+      "Bash(pnpm run build:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(pnpm run dev:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:localhost)"
+    ]
+  }
+}
