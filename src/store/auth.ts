@@ -36,18 +36,30 @@ interface AuthState {
 
 let refreshTimerId: ReturnType<typeof setInterval> | null = null;
 
-function persistTokens(token: string, refreshToken: string) {
+function persistSession(user: User, token: string, refreshToken: string) {
   localStorage.setItem('access_token', token);
   localStorage.setItem('refresh_token', refreshToken);
+  localStorage.setItem('user', JSON.stringify(user));
 }
 
-function clearTokens() {
+function clearSession() {
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
 }
 
 function getStoredRefreshToken() {
   return localStorage.getItem('refresh_token');
+}
+
+function getStoredUser(): User | null {
+  try {
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    return JSON.parse(raw) as User;
+  } catch {
+    return null;
+  }
 }
 
 function extractErrorMessage(error: unknown): string {
@@ -64,13 +76,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isInitialized: false,
 
   setSession: (user, token, refreshToken) => {
-    persistTokens(token, refreshToken);
+    persistSession(user, token, refreshToken);
     set({ user, isLoading: false });
     get().startTokenRefreshTimer();
   },
 
   clearSession: () => {
-    clearTokens();
+    clearSession();
     get().stopTokenRefreshTimer();
     set({ user: null, isLoading: false });
   },
@@ -83,57 +95,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const token = localStorage.getItem('access_token');
     const refreshToken = getStoredRefreshToken();
+    const user = getStoredUser();
 
-    if (!token || !refreshToken) {
+    if (!token || !refreshToken || !user) {
+      clearSession();
       set({ isInitialized: true });
       return;
     }
 
-    // Decode the JWT payload to restore the user without an API call
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const user: User = {
-        id: payload.sub,
-        email: payload.email,
-        username: payload.username,
-        displayName: payload.displayName ?? null,
-        avatarUrl: payload.avatarUrl ?? null,
-        bio: payload.bio ?? null,
-        emailVerified: payload.emailVerified ?? false,
-        role: payload.role ?? 'user',
-        subscriptionPlan: payload.subscriptionPlan ?? 'free',
-        createdAt: payload.createdAt ?? '',
-      };
-
-      set({ user, isInitialized: true });
-      get().startTokenRefreshTimer();
-    } catch {
-      // Token is malformed — attempt a refresh
-      authService
-        .refreshToken(refreshToken)
-        .then(({ data }) => {
-          persistTokens(data.token, data.refreshToken);
-          const payload = JSON.parse(atob(data.token.split('.')[1]));
-          const user: User = {
-            id: payload.sub,
-            email: payload.email,
-            username: payload.username,
-            displayName: payload.displayName ?? null,
-            avatarUrl: payload.avatarUrl ?? null,
-            bio: payload.bio ?? null,
-            emailVerified: payload.emailVerified ?? false,
-            role: payload.role ?? 'user',
-            subscriptionPlan: payload.subscriptionPlan ?? 'free',
-            createdAt: payload.createdAt ?? '',
-          };
-          set({ user, isInitialized: true });
-          get().startTokenRefreshTimer();
-        })
-        .catch(() => {
-          clearTokens();
-          set({ isInitialized: true });
-        });
-    }
+    set({ user, isInitialized: true });
+    get().startTokenRefreshTimer();
   },
 
   signUpWithEmail: async (data) => {
@@ -196,7 +167,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         try {
           const { data } = await authService.refreshToken(refreshToken);
-          persistTokens(data.token, data.refreshToken);
+          localStorage.setItem('access_token', data.token);
+          localStorage.setItem('refresh_token', data.refreshToken);
         } catch {
           get().clearSession();
           if (typeof window !== 'undefined') {
