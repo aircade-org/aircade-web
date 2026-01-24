@@ -1,8 +1,18 @@
+'use client';
+
 import { ReactNode } from 'react';
+
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import FaultyTerminal from './faulty-terminal';
 
 export function Background(): ReactNode {
+  const isMobile: boolean = useIsMobile();
+
+  if (isMobile) {
+    return null;
+  }
+
   return (
     <div
       className="pointer-events-none absolute inset-0 -z-10 bg-transparent"
