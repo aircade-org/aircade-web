@@ -27,3 +27,4 @@ public/**/*.gif
 public/**/*.svg
 public/**/*.ico
 public/**/*.webp
+/src/components/ui

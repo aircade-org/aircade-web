@@ -106,6 +106,7 @@ const eslintConfig = defineConfig([
     'storybook-static/**',
     '.storybook/public/**',
     'docs/.vitepress/cache/**',
+    'src/components/ui',
   ]),
 ]);
 
