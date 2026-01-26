@@ -16,15 +16,18 @@ export function ControllerSession() {
 
   if (session.status === 'ended') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
-        <CircleOff className="text-muted-foreground size-10" />
-        <h2 className="text-xl font-bold">Session Ended</h2>
-        <p className="text-muted-foreground text-sm">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 p-4 sm:gap-4">
+        <CircleOff className="text-muted-foreground size-8 sm:size-10" />
+        <h2 className="text-center text-lg font-bold sm:text-xl">
+          Session Ended
+        </h2>
+        <p className="text-muted-foreground text-center text-sm">
           The host has ended the session.
         </p>
         <Button
           variant="outline"
           onClick={reset}
+          className="h-11 sm:h-10"
         >
           Join Another Session
         </Button>

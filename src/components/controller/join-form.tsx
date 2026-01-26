@@ -57,14 +57,14 @@ export function JoinForm({ defaultSessionCode }: JoinFormProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
+    <div className="flex min-h-[100dvh] items-center justify-center p-3 sm:p-4">
       <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <div className="mb-2 flex justify-center">
-            <Gamepad2 className="text-muted-foreground size-10" />
+        <CardHeader className="space-y-1 text-center">
+          <div className="mb-1 flex justify-center sm:mb-2">
+            <Gamepad2 className="text-muted-foreground size-8 sm:size-10" />
           </div>
-          <CardTitle>Join Game</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl sm:text-2xl">Join Game</CardTitle>
+          <CardDescription className="text-sm">
             Enter the session code shown on the big screen.
           </CardDescription>
         </CardHeader>
@@ -72,18 +72,18 @@ export function JoinForm({ defaultSessionCode }: JoinFormProps) {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4"
+              className="space-y-3 sm:space-y-4"
             >
               <FormField
                 control={form.control}
                 name="sessionCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Session Code</FormLabel>
+                    <FormLabel className="text-sm">Session Code</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="XKCD42"
-                        className="text-center font-mono text-lg tracking-widest uppercase"
+                        className="h-11 text-center font-mono text-base tracking-widest uppercase sm:h-10 sm:text-lg"
                         maxLength={6}
                         autoComplete="off"
                         autoCapitalize="characters"
@@ -102,10 +102,11 @@ export function JoinForm({ defaultSessionCode }: JoinFormProps) {
                 name="displayName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Display Name</FormLabel>
+                    <FormLabel className="text-sm">Display Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Your name"
+                        className="h-11 sm:h-10"
                         maxLength={30}
                         autoComplete="off"
                         {...field}
@@ -118,7 +119,7 @@ export function JoinForm({ defaultSessionCode }: JoinFormProps) {
               <Button
                 type="submit"
                 disabled={isConnecting}
-                className="w-full"
+                className="h-11 w-full sm:h-10"
               >
                 {isConnecting ? (
                   <>

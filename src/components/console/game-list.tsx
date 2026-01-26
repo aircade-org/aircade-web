@@ -31,15 +31,21 @@ export function GameList() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md">
-      <h2 className="mb-6 text-center text-2xl font-bold">Games</h2>
+    <div className="mx-auto w-full max-w-sm p-4 sm:max-w-md lg:max-w-2xl xl:max-w-3xl">
+      <h2 className="mb-4 text-center text-xl font-bold sm:mb-6 sm:text-2xl lg:text-3xl">
+        Games
+      </h2>
       <Card>
-        <CardHeader>
-          <CardTitle>{PONG_GAME.title}</CardTitle>
-          <CardDescription>{PONG_GAME.description}</CardDescription>
+        <CardHeader className="space-y-1.5">
+          <CardTitle className="text-lg sm:text-xl lg:text-2xl">
+            {PONG_GAME.title}
+          </CardTitle>
+          <CardDescription className="text-sm lg:text-base">
+            {PONG_GAME.description}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-muted-foreground mb-4 flex items-center gap-4 text-xs">
+          <div className="text-muted-foreground mb-3 flex items-center gap-3 text-xs sm:mb-4 sm:gap-4 lg:text-sm">
             <span>
               Players: {PONG_GAME.minPlayers}–{PONG_GAME.maxPlayers}
             </span>
@@ -48,7 +54,7 @@ export function GameList() {
           <Button
             onClick={handlePlay}
             disabled={isConnecting}
-            className="w-full"
+            className="h-11 w-full sm:h-10 lg:h-12 lg:text-base"
           >
             {isConnecting ? (
               <>

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import { type NextFontWithVariable } from 'next/dist/compiled/@next/font';
 import { Lato, Spline_Sans_Mono } from 'next/font/google';
@@ -24,6 +24,26 @@ const splineSansMono: NextFontWithVariable = Spline_Sans_Mono({
 export const metadata: Metadata = {
   title: 'AirCade',
   description: 'Browser-Based Party Game Platform',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'AirCade',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
 };
 
 export default function RootLayout({

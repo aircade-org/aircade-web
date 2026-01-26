@@ -51,17 +51,17 @@ export function SiteHeader() {
 
   return (
     <header className="border-border/40 bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-      <div className="flex h-14 w-full items-center justify-between">
-        <div className="flex items-center">
+      <div className="flex h-14 w-full items-center justify-between px-2 sm:px-0">
+        <div className="flex items-center gap-2 sm:gap-0">
           <Link
             href="/"
-            className="flex items-center gap-2 pl-4"
+            className="flex items-center gap-1.5 sm:gap-2 sm:pl-4"
           >
-            <Monitor className="size-5" />
-            <span className="font-bold">AirCade</span>
+            <Monitor className="size-4 sm:size-5" />
+            <span className="text-sm font-bold sm:text-base">AirCade</span>
           </Link>
 
-          <nav className="ml-6 flex items-center gap-1">
+          <nav className="ml-2 hidden items-center gap-1 sm:ml-6 md:flex">
             {navItems.map(({ href, label, icon: Icon }) => (
               <Button
                 key={href}
@@ -82,9 +82,30 @@ export function SiteHeader() {
               </Button>
             ))}
           </nav>
+
+          <nav className="ml-2 flex items-center gap-0.5 sm:ml-4 md:hidden">
+            {navItems.map(({ href, icon: Icon }) => (
+              <Button
+                key={href}
+                variant="ghost"
+                size="icon-sm"
+                asChild
+              >
+                <Link
+                  href={href}
+                  className={cn(
+                    pathname?.startsWith(href) &&
+                      'bg-accent text-accent-foreground',
+                  )}
+                >
+                  <Icon className="size-4" />
+                </Link>
+              </Button>
+            ))}
+          </nav>
         </div>
 
-        <div className="flex items-center gap-2 pr-4">
+        <div className="flex items-center gap-1 sm:gap-2 sm:pr-4">
           <ThemeToggle />
           {user ? (
             <DropdownMenu>
@@ -138,6 +159,7 @@ export function SiteHeader() {
                 variant="ghost"
                 size="sm"
                 asChild
+                className="hidden sm:inline-flex"
               >
                 <Link href="/signin">Sign In</Link>
               </Button>
@@ -145,7 +167,10 @@ export function SiteHeader() {
                 size="sm"
                 asChild
               >
-                <Link href="/signup">Sign Up</Link>
+                <Link href="/signup">
+                  <span className="hidden sm:inline">Sign Up</span>
+                  <span className="sm:hidden">Join</span>
+                </Link>
               </Button>
             </>
           )}

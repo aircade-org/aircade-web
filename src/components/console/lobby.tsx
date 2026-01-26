@@ -58,30 +58,54 @@ export function Lobby() {
   const hasPlayers = players.length > 0;
 
   return (
-    <div className="mx-auto w-full max-w-lg space-y-6">
+    <div className="mx-auto w-full max-w-sm space-y-4 p-4 sm:max-w-md sm:space-y-6 lg:max-w-2xl xl:max-w-3xl">
       <Card>
-        <CardHeader className="text-center">
-          <CardDescription>Session Code</CardDescription>
-          <CardTitle className="font-mono text-5xl tracking-widest">
+        <CardHeader className="space-y-2 text-center sm:space-y-3">
+          <CardDescription className="text-base sm:text-lg">
+            Session Code
+          </CardDescription>
+          <CardTitle className="font-mono text-4xl tracking-widest sm:text-5xl lg:text-6xl xl:text-7xl">
             {session.sessionCode}
           </CardTitle>
           <div className="flex items-center justify-center gap-2 pt-1">
-            <Badge variant={isConnected ? 'default' : 'secondary'}>
+            <Badge
+              variant={isConnected ? 'default' : 'secondary'}
+              className="text-xs sm:text-sm"
+            >
               {isConnected ? 'Connected' : 'Connecting…'}
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
+        <CardContent className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6">
           {joinUrl && (
-            <div className="rounded-lg bg-white p-3">
+            <div className="rounded-lg bg-white p-2.5 sm:p-3 lg:p-4">
               <QRCodeSVG
                 value={joinUrl}
-                size={200}
+                size={180}
                 level="M"
+                className="sm:hidden"
+              />
+              <QRCodeSVG
+                value={joinUrl}
+                size={220}
+                level="M"
+                className="hidden sm:block lg:hidden"
+              />
+              <QRCodeSVG
+                value={joinUrl}
+                size={280}
+                level="M"
+                className="hidden lg:block xl:hidden"
+              />
+              <QRCodeSVG
+                value={joinUrl}
+                size={340}
+                level="M"
+                className="hidden xl:block"
               />
             </div>
           )}
-          <p className="text-muted-foreground text-center text-sm">
+          <p className="text-muted-foreground text-center text-xs sm:text-sm lg:text-base">
             Scan the QR code or go to{' '}
             <span className="font-mono font-medium text-white">
               /join/{session.sessionCode}
@@ -93,7 +117,9 @@ export function Lobby() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Players ({players.length})</CardTitle>
+          <CardTitle className="text-base sm:text-lg lg:text-xl">
+            Players ({players.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <PlayerList players={players} />
@@ -102,11 +128,11 @@ export function Lobby() {
 
       <Separator />
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-2 sm:flex-row sm:gap-3 lg:gap-4">
         <Button
           variant="outline"
           onClick={handleEndSession}
-          className="flex-1"
+          className="h-11 flex-1 sm:h-10 lg:h-12 lg:text-base"
         >
           <LogOut />
           End Session
@@ -114,7 +140,7 @@ export function Lobby() {
         <Button
           onClick={handleStartGame}
           disabled={!hasPlayers || isStarting}
-          className="flex-1"
+          className="h-11 flex-1 sm:h-10 lg:h-12 lg:text-base"
         >
           {isStarting ? (
             <>
@@ -131,7 +157,7 @@ export function Lobby() {
       </div>
 
       {!hasPlayers && (
-        <p className="text-muted-foreground text-center text-sm">
+        <p className="text-muted-foreground text-center text-xs sm:text-sm lg:text-base">
           Waiting for a player to connect before starting…
         </p>
       )}
