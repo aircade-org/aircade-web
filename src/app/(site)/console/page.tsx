@@ -11,6 +11,7 @@ import { useSessionStore } from '@/store/session';
 
 function ConsoleContent() {
   const session = useSessionStore((s) => s.session);
+  const isLoadingGame = useSessionStore((s) => s.isLoadingGame);
   const reset = useSessionStore((s) => s.reset);
 
   // Clean up session on unmount (navigating away)
@@ -24,7 +25,11 @@ function ConsoleContent() {
     );
   }
 
-  if (session.status === 'playing' || session.status === 'paused') {
+  // Only render game screen if status is playing/paused AND not currently loading
+  if (
+    (session.status === 'playing' || session.status === 'paused') &&
+    !isLoadingGame
+  ) {
     return <GameScreen />;
   }
 

@@ -31,6 +31,7 @@ interface SessionState {
   // Connection state
   isConnecting: boolean;
   isConnected: boolean;
+  isLoadingGame: boolean;
 
   // Callbacks for iframe bridge
   onPlayerInputEvent: ((payload: PlayerInputEventPayload) => void) | null;
@@ -80,6 +81,7 @@ const initialState = {
   currentPlayer: null,
   isConnecting: false,
   isConnected: false,
+  isLoadingGame: false,
   onPlayerInputEvent: null,
   onGameStateEvent: null,
 };
@@ -133,13 +135,30 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     const { session } = get();
     if (!session) return;
 
+    set({ isLoadingGame: true });
+
     try {
       const { data } = await sessionService.loadGame(session.id, gameId);
+
+      // Wait for WebSocket game_loaded event to confirm the game is ready
+      // The WS handler will update session status and set isLoadingGame to false
       set({
-        session: { ...session, ...data.session },
         gameVersion: data.gameVersion,
       });
+
+      // Wait up to 5 seconds for the WS event
+      const startTime = Date.now();
+      while (get().isLoadingGame && Date.now() - startTime < 5000) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      if (get().isLoadingGame) {
+        throw new Error(
+          'Game failed to load. WebSocket event not received in time.',
+        );
+      }
     } catch (error) {
+      set({ isLoadingGame: false });
       throw new Error(extractErrorMessage(error));
     }
   },
@@ -214,6 +233,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
                 gameVersionId: gameLoaded.gameVersionId,
               }
             : null,
+          isLoadingGame: false,
         }));
       }
     });
@@ -267,6 +287,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
               controllerScreenCode: gameLoaded.controllerScreenCode,
             }
           : state.gameVersion,
+        isLoadingGame: false,
       }));
     });
 
