@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { Code, Gamepad2, LogOut, Monitor, Tv, User } from 'lucide-react';
+import {
+  Code,
+  Gamepad2,
+  LogOut,
+  Monitor,
+  Settings,
+  Tv,
+  User,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -141,9 +149,15 @@ export function SiteHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
+                  <Link href={`/users/${user.username}`}>
                     <User className="size-4" />
                     Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">
+                    <Settings className="size-4" />
+                    Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
