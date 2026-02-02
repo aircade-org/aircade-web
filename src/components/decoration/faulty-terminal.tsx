@@ -33,6 +33,9 @@ export interface FaultyTerminalProps extends HTMLAttributes<HTMLDivElement> {
   brightness?: number;
 }
 
+const FPS: number = 30;
+const FRAME_TIME: number = 1000 / FPS;
+
 const vertexShader: string = `
 attribute vec2 position;
 attribute vec2 uv;
@@ -82,43 +85,45 @@ float noise(vec2 p)
   return sin(p.x * 10.0) * sin(p.y * (3.0 + sin(time * 0.090909))) + 0.2; 
 }
 
-mat2 rotate(float angle)
-{
-  float c = cos(angle);
-  float s = sin(angle);
-  return mat2(c, -s, s, c);
-}
-
 float fbm(vec2 p)
 {
   p *= 1.1;
   float f = 0.0;
   float amp = 0.5 * uNoiseAmp;
   
-  mat2 modify0 = rotate(time * 0.02);
+  float t02 = time * 0.02;
+  float ct02 = cos(t02);
+  float st02 = sin(t02);
+  
   f += amp * noise(p);
-  p = modify0 * p * 2.0;
+  p = mat2(ct02, -st02, st02, ct02) * p * 2.0;
   amp *= 0.454545;
   
-  mat2 modify1 = rotate(time * 0.02);
   f += amp * noise(p);
-  p = modify1 * p * 2.0;
+  p = mat2(ct02, -st02, st02, ct02) * p * 2.0;
   amp *= 0.454545;
   
-  mat2 modify2 = rotate(time * 0.08);
-  f += amp * noise(p);
+  float t08 = time * 0.08;
+  float ct08 = cos(t08);
+  float st08 = sin(t08);
+  f += amp * noise(mat2(ct08, -st08, st08, ct08) * p);
   
   return f;
 }
 
 float pattern(vec2 p, out vec2 q, out vec2 r) {
   vec2 offset1 = vec2(1.0);
-  vec2 offset0 = vec2(0.0);
-  mat2 rot01 = rotate(0.1 * time);
-  mat2 rot1 = rotate(0.1);
+  float t01 = time * 0.1;
+  float ct01 = cos(t01);
+  float st01 = sin(t01);
+  mat2 rot01 = mat2(ct01, -st01, st01, ct01);
   
   q = vec2(fbm(p + offset1), fbm(rot01 * p + offset1));
-  r = vec2(fbm(rot1 * q + offset0), fbm(q + offset0));
+  
+  const float c01 = 0.99500416527;
+  const float s01 = 0.09983341664;
+  r = vec2(fbm(mat2(c01, -s01, s01, c01) * q), fbm(q));
+  
   return fbm(p + r);
 }
 
@@ -142,14 +147,12 @@ float digit(vec2 p){
     if(uUsePageLoadAnimation > 0.5){
         float cellRandom = fract(sin(dot(s, vec2(12.9898, 78.233))) * 43758.5453);
         float cellDelay = cellRandom * 0.8;
-        float cellProgress = clamp((uPageLoadProgress - cellDelay) / 0.2, 0.0, 1.0);
+        float cellProgress = clamp((uPageLoadProgress - cellDelay) * 5.0, 0.0, 1.0);
         
-        float fadeAlpha = smoothstep(0.0, 1.0, cellProgress);
-        intensity *= fadeAlpha;
+        intensity *= smoothstep(0.0, 1.0, cellProgress);
     }
     
-    p = fract(p);
-    p *= uDigitSize;
+    p = fract(p) * uDigitSize;
     
     float px5 = p.x * 5.0;
     float py5 = (1.0 - p.y) * 5.0;
@@ -158,13 +161,13 @@ float digit(vec2 p){
     
     float i = floor(py5) - 2.0;
     float j = floor(px5) - 2.0;
-    float n = i * i + j * j;
-    float f = n * 0.0625;
+    float f = (i * i + j * j) * 0.0625;
     
     float isOn = step(0.1, intensity - f);
     float brightness = isOn * (0.2 + y * 0.8) * (0.75 + x * 0.25);
     
-    return step(0.0, p.x) * step(p.x, 1.0) * step(0.0, p.y) * step(p.y, 1.0) * brightness;
+    vec2 inBounds = step(0.0, p) * step(p, vec2(1.0));
+    return inBounds.x * inBounds.y * brightness;
 }
 
 float onOff(float a, float b, float c)
@@ -180,33 +183,25 @@ float displace(vec2 look)
 }
 
 vec3 getColor(vec2 p){
-    
     float bar = step(mod(p.y + time * 20.0, 1.0), 0.2) * 0.4 + 1.0;
     bar *= uScanlineIntensity;
     
     float displacement = displace(p);
-    p.x += displacement;
-
-    if (uGlitchAmount != 1.0) {
-      float extra = displacement * (uGlitchAmount - 1.0);
-      p.x += extra;
-    }
+    p.x += displacement * uGlitchAmount;
 
     float middle = digit(p);
     
     const float off = 0.002;
     float sum = digit(p + vec2(-off, -off)) + digit(p + vec2(0.0, -off)) + digit(p + vec2(off, -off)) +
-                digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(off, 0.0)) +
+                digit(p + vec2(-off, 0.0)) + digit(p + vec2(off, 0.0)) +
                 digit(p + vec2(-off, off)) + digit(p + vec2(0.0, off)) + digit(p + vec2(off, off));
     
-    vec3 baseColor = vec3(0.9) * middle + sum * 0.1 * vec3(1.0) * bar;
-    return baseColor;
+    return vec3(0.9) * middle + sum * 0.1 * bar;
 }
 
 vec2 barrel(vec2 uv){
   vec2 c = uv * 2.0 - 1.0;
-  float r2 = dot(c, c);
-  c *= 1.0 + uCurvature * r2;
+  c *= 1.0 + uCurvature * dot(c, c);
   return c * 0.5 + 0.5;
 }
 
@@ -227,30 +222,21 @@ void main() {
       col.b = getColor(p - ca).b;
     }
 
-    col *= uTint;
-    col *= uBrightness;
+    col *= uTint * uBrightness;
 
     if(uDither > 0.0){
       float rnd = hash21(gl_FragCoord.xy);
       col += (rnd - 0.5) * (uDither * 0.003922);
     }
 
-    float alpha = clamp(length(col), 0.0, 1.0);
-    gl_FragColor = vec4(col, alpha);
+    gl_FragColor = vec4(col, clamp(length(col), 0.0, 1.0));
 }
 `;
 
 function hexToRgb(hex: string): [number, number, number] {
-  let h: string = hex.replace('#', '').trim();
-
-  if (h.length === 3) {
-    h = h
-      .split('')
-      .map((c) => c + c)
-      .join('');
-  }
-
-  const num: number = parseInt(h, 16);
+  const h: string = hex.replace('#', '').trim();
+  const expanded = h.length === 3 ? h[0] + h[0] + h[1] + h[1] + h[2] + h[2] : h;
+  const num: number = parseInt(expanded, 16);
 
   return [
     ((num >> 16) & 255) / 255,
@@ -283,22 +269,21 @@ export default function FaultyTerminal({
   ...rest
 }: FaultyTerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const programRef = useRef<Program>(null);
-  const rendererRef = useRef<Renderer>(null);
+  const glRef = useRef<WebGLRenderingContext | null>(null);
+  const meshRef = useRef<Mesh | null>(null);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
   const smoothMouseRef = useRef({ x: 0.5, y: 0.5 });
   const frozenTimeRef = useRef(0);
   const rafRef = useRef<number>(0);
   const loadAnimationStartRef = useRef<number>(0);
-  const timeOffsetRef = useRef<number>(0);
+  const timeOffsetRef = useRef<number>(Math.random() * 100);
+  const lastFrameTimeRef = useRef<number>(0);
 
   const tintVec = useMemo(() => hexToRgb(tint), [tint]);
-
   const ditherValue = useMemo(
     () => (typeof dither === 'boolean' ? (dither ? 1 : 0) : dither),
     [dither],
   );
-
   const resolvedDpr = useMemo(() => {
     if (typeof window === 'undefined') return dpr;
     return Math.min(window.devicePixelRatio || 1, 2);
@@ -308,23 +293,19 @@ export default function FaultyTerminal({
     const ctn = containerRef.current;
     if (!ctn) return;
     const rect = ctn.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = 1 - (e.clientY - rect.top) / rect.height;
-    mouseRef.current = { x, y };
+    mouseRef.current = {
+      x: (e.clientX - rect.left) / rect.width,
+      y: 1 - (e.clientY - rect.top) / rect.height,
+    };
   }, []);
 
   useEffect(() => {
     const ctn = containerRef.current;
     if (!ctn) return;
 
-    // Initialize time offset once per mount
-    if (timeOffsetRef.current === 0) {
-      timeOffsetRef.current = Math.random() * 100;
-    }
-
     const renderer = new Renderer({ dpr: resolvedDpr, alpha: true });
-    rendererRef.current = renderer;
     const gl = renderer.gl;
+    glRef.current = gl;
     gl.clearColor(0, 0, 0, 0);
 
     const geometry = new Triangle(gl);
@@ -342,7 +323,6 @@ export default function FaultyTerminal({
           ),
         },
         uScale: { value: scale },
-
         uGridMul: { value: new Float32Array(gridMul) },
         uDigitSize: { value: digitSize },
         uScanlineIntensity: { value: scanlineIntensity },
@@ -353,12 +333,7 @@ export default function FaultyTerminal({
         uDither: { value: ditherValue },
         uCurvature: { value: curvature },
         uTint: { value: new Color(tintVec[0], tintVec[1], tintVec[2]) },
-        uMouse: {
-          value: new Float32Array([
-            smoothMouseRef.current.x,
-            smoothMouseRef.current.y,
-          ]),
-        },
+        uMouse: { value: new Float32Array([0.5, 0.5]) },
         uMouseStrength: { value: mouseStrength },
         uUseMouse: { value: mouseReact ? 1 : 0 },
         uPageLoadProgress: { value: pageLoadAnimation ? 0 : 1 },
@@ -366,26 +341,29 @@ export default function FaultyTerminal({
         uBrightness: { value: brightness },
       },
     });
-    programRef.current = program;
 
     const mesh = new Mesh(gl, { geometry, program });
+    meshRef.current = mesh;
 
-    function resize() {
-      if (!ctn || !renderer) return;
+    const resize = () => {
+      if (!ctn) return;
       renderer.setSize(ctn.offsetWidth, ctn.offsetHeight);
-      program.uniforms.iResolution.value = new Color(
+      program.uniforms.iResolution.value.set(
         gl.canvas.width,
         gl.canvas.height,
         gl.canvas.width / gl.canvas.height,
       );
-    }
+    };
 
-    const resizeObserver = new ResizeObserver(() => resize());
+    const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(ctn);
     resize();
 
     const update = (t: number) => {
       rafRef.current = requestAnimationFrame(update);
+
+      if (t - lastFrameTimeRef.current < FRAME_TIME) return;
+      lastFrameTimeRef.current = t;
 
       if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
         loadAnimationStartRef.current = t;
@@ -400,18 +378,18 @@ export default function FaultyTerminal({
       }
 
       if (pageLoadAnimation && loadAnimationStartRef.current > 0) {
-        const animationDuration = 2000;
         const animationElapsed = t - loadAnimationStartRef.current;
-        const progress = Math.min(animationElapsed / animationDuration, 1);
-        program.uniforms.uPageLoadProgress.value = progress;
+        program.uniforms.uPageLoadProgress.value = Math.min(
+          animationElapsed * 0.0005,
+          1,
+        );
       }
 
       if (mouseReact) {
-        const dampingFactor = 0.08;
         const smoothMouse = smoothMouseRef.current;
         const mouse = mouseRef.current;
-        smoothMouse.x += (mouse.x - smoothMouse.x) * dampingFactor;
-        smoothMouse.y += (mouse.y - smoothMouse.y) * dampingFactor;
+        smoothMouse.x += (mouse.x - smoothMouse.x) * 0.08;
+        smoothMouse.y += (mouse.y - smoothMouse.y) * 0.08;
 
         const mouseUniform = program.uniforms.uMouse.value as Float32Array;
         mouseUniform[0] = smoothMouse.x;
@@ -420,6 +398,7 @@ export default function FaultyTerminal({
 
       renderer.render({ scene: mesh });
     };
+
     rafRef.current = requestAnimationFrame(update);
     ctn.appendChild(gl.canvas);
 
@@ -431,7 +410,8 @@ export default function FaultyTerminal({
       if (mouseReact) ctn.removeEventListener('mousemove', handleMouseMove);
       if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
-      loadAnimationStartRef.current = 0;
+      meshRef.current = null;
+      glRef.current = null;
     };
   }, [
     resolvedDpr,
@@ -458,8 +438,14 @@ export default function FaultyTerminal({
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full overflow-hidden ${className}`}
-      style={style}
+      className={className}
+      style={{
+        position: 'relative',
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+        ...style,
+      }}
       {...rest}
     />
   );
