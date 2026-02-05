@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
+import { resolveAssetUrl } from '@/lib/utils';
+
 import * as userService from '@/services/user';
 
 import { useAuthStore } from '@/store/auth';
@@ -111,7 +113,7 @@ export function AvatarUpload({
     return user?.username.slice(0, 2).toUpperCase() ?? '??';
   }
 
-  const currentAvatarUrl = previewUrl || user?.avatarUrl;
+  const currentAvatarUrl = previewUrl ?? resolveAssetUrl(user?.avatarUrl);
 
   return (
     <div className="flex flex-col items-center gap-4">

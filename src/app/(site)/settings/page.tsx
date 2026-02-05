@@ -7,6 +7,7 @@ import { Mail, User } from 'lucide-react';
 import type { FullUserProfile } from '@/types/user';
 
 import { AuthGuard } from '@/components/auth-guard';
+import { Background } from '@/components/decoration/background';
 import { AvatarUpload } from '@/components/settings/avatar-upload';
 import { DeactivateAccountDialog } from '@/components/settings/deactivate-account-dialog';
 import { EmailChangeDialog } from '@/components/settings/email-change-dialog';
@@ -246,6 +247,7 @@ function SettingsContent() {
           </div>
         </CardContent>
       </Card>
+      <Background />
     </div>
   );
 }

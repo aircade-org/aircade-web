@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { cn } from '@/lib/utils';
+import { cn, resolveAssetUrl } from '@/lib/utils';
 
 import { useAuthStore } from '@/store/auth';
 
@@ -126,7 +126,7 @@ export function SiteHeader() {
                   <Avatar size="sm">
                     {user.avatarUrl && (
                       <AvatarImage
-                        src={user.avatarUrl}
+                        src={resolveAssetUrl(user.avatarUrl)}
                         alt={user.username}
                       />
                     )}

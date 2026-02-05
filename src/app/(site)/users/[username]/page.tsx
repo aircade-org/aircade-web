@@ -15,12 +15,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 
+import { resolveAssetUrl } from '@/lib/utils';
+
 import * as userService from '@/services/user';
 
 interface UserGame {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   thumbnailUrl: string | null;
   minPlayers: number;
   maxPlayers: number;
@@ -56,9 +58,11 @@ function GameCard({ game }: { game: UserGame }) {
       </div>
       <CardHeader>
         <CardTitle className="line-clamp-1">{game.title}</CardTitle>
-        <p className="text-muted-foreground line-clamp-2 text-sm">
-          {game.description}
-        </p>
+        {game.description && (
+          <p className="text-muted-foreground line-clamp-2 text-sm">
+            {game.description}
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-muted-foreground flex items-center gap-4 text-sm">
@@ -114,11 +118,11 @@ export default function UserProfilePage() {
       try {
         const [profileRes, gamesRes] = await Promise.all([
           userService.getPublicUserProfile(username),
-          userService.getUserGames(username, { page: 1, limit: 20 }),
+          userService.getUserGames(username, { offset: 0, limit: 20 }),
         ]);
 
         setProfile(profileRes.data);
-        setGames(gamesRes.data.items);
+        setGames(gamesRes.data.data);
       } catch (err: unknown) {
         // Handle different error types
         if (err && typeof err === 'object' && 'response' in err) {
@@ -190,7 +194,7 @@ export default function UserProfilePage() {
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
         <Avatar className="h-32 w-32">
           <AvatarImage
-            src={profile.avatarUrl ?? undefined}
+            src={resolveAssetUrl(profile.avatarUrl)}
             alt={profile.username}
           />
           <AvatarFallback className="text-3xl">{getInitials()}</AvatarFallback>

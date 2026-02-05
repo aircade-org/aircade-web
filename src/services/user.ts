@@ -58,13 +58,13 @@ export function getUserStats() {
 
 export function getUserGames(
   username: string,
-  params?: { page?: number; limit?: number },
+  params?: { offset?: number; limit?: number },
 ) {
   return apiClient.get<{
-    items: Array<{
+    data: Array<{
       id: string;
       title: string;
-      description: string;
+      description: string | null;
       thumbnailUrl: string | null;
       minPlayers: number;
       maxPlayers: number;
@@ -74,7 +74,7 @@ export function getUserGames(
       createdAt: string;
     }>;
     total: number;
-    page: number;
+    offset: number;
     limit: number;
   }>(`/users/${username}/games`, { params });
 }
