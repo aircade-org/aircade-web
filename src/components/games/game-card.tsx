@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   Pencil,
   Send,
+  Settings,
   Star,
   Trash2,
   Users,
@@ -117,7 +118,7 @@ export function GameCard({ game }: GameCardProps) {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/studio/games/${game.id}/settings`}>
-                    <Pencil className="size-4" />
+                    <Settings className="size-4" />
                     Settings
                   </Link>
                 </DropdownMenuItem>

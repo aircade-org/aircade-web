@@ -57,6 +57,9 @@ export function SiteHeader() {
     router.push('/');
   };
 
+  // Hide header on full-screen editor routes
+  if (pathname?.endsWith('/editor')) return null;
+
   return (
     <header className="border-border/40 bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="flex h-14 w-full items-center justify-between px-2 sm:px-0">

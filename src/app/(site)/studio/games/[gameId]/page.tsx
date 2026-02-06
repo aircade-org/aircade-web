@@ -7,9 +7,9 @@ import { useParams } from 'next/navigation';
 
 import {
   ArrowLeft,
+  Code2,
   FileBox,
   History,
-  Pencil,
   Send,
   Settings,
 } from 'lucide-react';
@@ -23,7 +23,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -162,21 +161,18 @@ function GameOverviewContent({ gameId }: { gameId: string }) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="flex flex-col">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Pencil className="text-muted-foreground size-4" />
-              <CardTitle className="text-base">Code Editor</CardTitle>
-            </div>
-            <CardDescription>
-              Write and edit your game and controller code
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="mt-auto">
-            <p className="text-muted-foreground text-sm">
-              Coming in M0.5.0 — Creative Studio
-            </p>
-          </CardContent>
+        <Card className="hover:bg-accent/50 transition-colors">
+          <Link href={`/studio/games/${game.id}/editor`}>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Code2 className="text-muted-foreground size-4" />
+                <CardTitle className="text-base">Code Editor</CardTitle>
+              </div>
+              <CardDescription>
+                Write and edit your game and controller code
+              </CardDescription>
+            </CardHeader>
+          </Link>
         </Card>
 
         {actions.map(({ title, description, href, icon: Icon }) => (
