@@ -29,7 +29,7 @@ const navItems = [
 ];
 
 function getUserInitials(username: string, displayName: string | null): string {
-  const name = displayName ?? username;
+  const name = displayName || username || '?';
   return name
     .split(/[\s_-]+/)
     .slice(0, 2)
