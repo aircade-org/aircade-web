@@ -38,10 +38,14 @@ const experiences = [
 export default function Home() {
   return (
     <div className="flex h-full flex-col items-center justify-center px-4">
-      <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">AirCade</h1>
-      <p className="text-muted-foreground mt-4 max-w-md text-center text-lg">
-        Create, host, and play multiplayer games - right from the browser.
-      </p>
+      <div className="mx-auto max-w-2xl rounded-3xl px-40 py-5 text-center ring-1 ring-white/5 backdrop-blur-xl">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          AirCade
+        </h1>
+        <p className="text-muted-foreground mx-auto mt-4 max-w-md text-lg">
+          Create. Play. Share.
+        </p>
+      </div>
 
       <div className="mt-12 grid w-full max-w-3xl gap-6 sm:grid-cols-3">
         {experiences.map(({ title, description, icon: Icon, href }) => (
