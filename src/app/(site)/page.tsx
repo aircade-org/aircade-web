@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { Code, Gamepad2, Tv } from 'lucide-react';
 
+import { Background } from '@/components/decoration/background';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -64,6 +65,7 @@ export default function Home() {
           </Card>
         ))}
       </div>
+      <Background />
     </div>
   );
 }

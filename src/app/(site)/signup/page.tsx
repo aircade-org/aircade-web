@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
+import { Background } from '@/components/decoration/background';
 import { OAuthButtons } from '@/components/oauth-buttons';
 import { Button } from '@/components/ui/button';
 import {
@@ -175,6 +176,7 @@ export default function SignUpPage() {
           </p>
         </CardFooter>
       </Card>
+      <Background />
     </div>
   );
 }
