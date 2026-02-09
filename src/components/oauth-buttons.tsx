@@ -37,27 +37,35 @@ interface OAuthButtonsProps {
 }
 
 export function OAuthButtons({ redirectUri }: OAuthButtonsProps) {
+  const handleGoogleClick = () => {
+    const finalRedirectUri =
+      redirectUri ?? `${window.location.origin}/auth/callback`;
+    window.location.href = getGoogleOAuthUrl(finalRedirectUri);
+  };
+
+  const handleGitHubClick = () => {
+    const finalRedirectUri =
+      redirectUri ?? `${window.location.origin}/auth/callback`;
+    window.location.href = getGitHubOAuthUrl(finalRedirectUri);
+  };
+
   return (
     <div className="grid grid-cols-2 gap-3">
       <Button
         variant="outline"
         type="button"
-        asChild
+        onClick={handleGoogleClick}
       >
-        <a href={getGoogleOAuthUrl(redirectUri)}>
-          <GoogleIcon className="size-4" />
-          Google
-        </a>
+        <GoogleIcon className="size-4" />
+        Google
       </Button>
       <Button
         variant="outline"
         type="button"
-        asChild
+        onClick={handleGitHubClick}
       >
-        <a href={getGitHubOAuthUrl(redirectUri)}>
-          <Github className="size-4" />
-          GitHub
-        </a>
+        <Github className="size-4" />
+        GitHub
       </Button>
     </div>
   );

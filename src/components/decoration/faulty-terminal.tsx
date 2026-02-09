@@ -1,6 +1,12 @@
 'use client';
 
-import { HTMLAttributes, useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+  type HTMLAttributes,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 import { Color, Mesh, Program, Renderer, Triangle } from 'ogl';
 
@@ -284,7 +290,7 @@ export default function FaultyTerminal({
   const frozenTimeRef = useRef(0);
   const rafRef = useRef<number>(0);
   const loadAnimationStartRef = useRef<number>(0);
-  const timeOffsetRef = useRef<number>(Math.random() * 100);
+  const timeOffsetRef = useRef<number>(0);
 
   const tintVec = useMemo(() => hexToRgb(tint), [tint]);
 
@@ -310,6 +316,11 @@ export default function FaultyTerminal({
   useEffect(() => {
     const ctn = containerRef.current;
     if (!ctn) return;
+
+    // Initialize time offset once per mount
+    if (timeOffsetRef.current === 0) {
+      timeOffsetRef.current = Math.random() * 100;
+    }
 
     const renderer = new Renderer({ dpr: resolvedDpr, alpha: true });
     rendererRef.current = renderer;
@@ -421,7 +432,6 @@ export default function FaultyTerminal({
       if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
       loadAnimationStartRef.current = 0;
-      timeOffsetRef.current = Math.random() * 100;
     };
   }, [
     resolvedDpr,
