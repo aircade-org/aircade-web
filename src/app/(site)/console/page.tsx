@@ -1,13 +1,44 @@
-import { Tv } from 'lucide-react';
+'use client';
+
+import { useEffect } from 'react';
+
+import { AuthGuard } from '@/components/auth-guard';
+import { GameList } from '@/components/console/game-list';
+import { GameScreen } from '@/components/console/game-screen';
+import { Lobby } from '@/components/console/lobby';
+
+import { useSessionStore } from '@/store/session';
+
+function ConsoleContent() {
+  const session = useSessionStore((s) => s.session);
+  const reset = useSessionStore((s) => s.reset);
+
+  // Clean up session on unmount (navigating away)
+  useEffect(() => () => reset(), [reset]);
+
+  if (!session) {
+    return (
+      <div className="flex h-full items-center justify-center px-4">
+        <GameList />
+      </div>
+    );
+  }
+
+  if (session.status === 'playing' || session.status === 'paused') {
+    return <GameScreen />;
+  }
+
+  return (
+    <div className="flex h-full items-center justify-center px-4 py-8">
+      <Lobby />
+    </div>
+  );
+}
 
 export default function ConsolePage() {
   return (
-    <div className="flex h-full flex-col items-center justify-center px-4">
-      <Tv className="text-muted-foreground mb-4 size-12" />
-      <h1 className="text-2xl font-bold">Console</h1>
-      <p className="text-muted-foreground mt-2">
-        The big screen game lobby is coming soon.
-      </p>
-    </div>
+    <AuthGuard>
+      <ConsoleContent />
+    </AuthGuard>
   );
 }
