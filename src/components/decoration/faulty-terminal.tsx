@@ -33,6 +33,9 @@ export interface FaultyTerminalProps extends HTMLAttributes<HTMLDivElement> {
   brightness?: number;
 }
 
+const FPS: number = 30;
+const FRAME_TIME: number = 1000 / FPS;
+
 const vertexShader: string = `
 attribute vec2 position;
 attribute vec2 uv;
@@ -384,8 +387,13 @@ export default function FaultyTerminal({
     resizeObserver.observe(ctn);
     resize();
 
+    let lastTime: number = 0;
+
     const update = (t: number) => {
       rafRef.current = requestAnimationFrame(update);
+
+      if (t - lastTime < FRAME_TIME) return;
+      lastTime = t;
 
       if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
         loadAnimationStartRef.current = t;
